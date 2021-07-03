@@ -15,9 +15,9 @@ use App\Http\Controllers\RedisController;
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/', function () {
+    return view('welcome');
+});
 
 Route::get('send-message',[RedisController::class, 'index']);
 Route::post('send-message',[RedisController::class,'postSendMessage']);

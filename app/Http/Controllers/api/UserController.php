@@ -149,7 +149,7 @@ class UserController extends Controller
             $users = $users->where('full_name', 'like', "%{$request->value}%");
         }
         $users = $users->orderByDesc('users.id')->get();
-        return response()->json($users);
+        return response()->json("kkk");
     }
 
     public function numberOfUsers()
@@ -163,7 +163,7 @@ class UserController extends Controller
     {
         $user = DB::table('users')
             ->join('roles', 'roles.id', 'users.role_id')
-            ->join('user_statuses', 'user_statuses.id', 'users.status_id')
+            ->join('statuses', 'statuses.id', 'users.status_id')
             ->select('users.id', 'full_name', 'avatar', 'address', 'phone', 'email', 'number_of_device', 'status', 'roles.name as role')
             ->where('users.id', $id)
             ->first();
