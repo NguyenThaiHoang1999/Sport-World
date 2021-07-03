@@ -140,16 +140,16 @@ class UserController extends Controller
 
     public function getUsers(Request $request)
     {
-        $users = DB::table('users')
-            ->join('roles', 'roles.id', 'users.role_id')
-            ->join('statuses', 'statuses.id', 'users.status_id')
-            ->select('users.id', 'full_name as name', 'users.created_at as registered', 'roles.name as role', 'statuses.status');
+        // $users = DB::table('users')
+        //     ->join('roles', 'roles.id', 'users.role_id')
+        //     ->join('statuses', 'statuses.id', 'users.status_id')
+        //     ->select('users.id', 'full_name as name', 'users.created_at as registered', 'roles.name as role', 'statuses.status');
 
-        if ($request->value != null) {
-            $users = $users->where('full_name', 'like', "%{$request->value}%");
-        }
-        $users = $users->orderByDesc('users.id')->get();
-        return response()->json("kkk");
+        // if ($request->value != null) {
+        //     $users = $users->where('full_name', 'like', "%{$request->value}%");
+        // }
+        // $users = $users->orderByDesc('users.id')->get();
+        return response()->json("hhhhhh");
     }
 
     public function numberOfUsers()
