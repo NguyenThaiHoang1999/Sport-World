@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\UserController;
+use App\Http\Controllers\api\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,7 +29,11 @@ Route::post('/user-profile', [UserController::class, 'userProfile']); // signed 
 Route::put('/user-profile', [UserController::class, 'updateUserProfile']); // update user profile
 Route::get('/verify-email/{email}/{email_token}', [UserController::class, 'verifyEmail']); // signed in user profile
 Route::get('/users', [UserController::class, 'getUsers']); // all users
-Route::get('/users/{id}', [UserController::class, 'getUserById']); // get user by id
+Route::get('/users/{id}', [UserController::class, 'getUserProfile']); // get user by id
 Route::post('/users/{id}', [UserController::class, 'updateStatusUserById']); // update Status User by id
 
-
+/*===============================EatGroup==============================*/
+Route::get('/products', [ProductController::class, 'getProducts']); // all groups eating
+Route::post('/products', [ProductController::class, 'createProduct']); // create group eating
+Route::get('/products/{id}', [ProductController::class, 'getProduct']); // get group eating
+Route::delete('/products/{id}', [ProductController::class, 'deleteProduct']); // delete group eating
