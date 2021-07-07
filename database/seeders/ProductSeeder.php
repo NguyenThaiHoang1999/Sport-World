@@ -18,12 +18,14 @@ class ProductSeeder extends Seeder
         $brandID = DB::table('brands')->pluck('id');
         $categoryID = DB::table('categories')->pluck('id');
         $placeID = DB::table('places')->pluck('id');
+        $userID = DB::table('users')->pluck('id');
         for ($i=0; $i < 10; $i++) {
             DB::table('products')->insert([
                 'product_name'  => $faker->name(),
                 'brand_id'      =>$faker->randomElement($brandID),
                 'category_id'   =>$faker->randomElement($categoryID),
                 'place_id'   =>$faker->randomElement($placeID),
+                'user_id'   =>$faker->randomElement($userID),
                 'product_desc'  =>$faker->realText($maxNbChars = 200, $indexSize = 2),
                 'product_title' => $faker->realText($maxNbChars = 200, $indexSize = 2),
                 'product_price' => 100000,
