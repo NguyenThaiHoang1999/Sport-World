@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Model\Product;
 
 class ProductController extends Controller
 {
@@ -30,7 +31,7 @@ class ProductController extends Controller
             );
         $products = $products
             ->orderBy('products.created_at', 'desc')
-            ->paginate(10);
+            ->paginate(8);
         return response()->json($products);
     }
 
@@ -66,9 +67,6 @@ class ProductController extends Controller
     }
     public function getProduct($id)
     {
-        // if (auth()->user() == null) {
-        //     return response()->json(["error" => "Your session has expired. Please sign in again."]);
-        // }
         $product = DB::table('products')
             ->join('users', 'users.id', 'products.user_id')
             ->join('places', 'places.id', 'products.place_id')
@@ -90,4 +88,125 @@ class ProductController extends Controller
         return response()->json($product);
     }
 
+    public function getProductByCategory($categoryID)
+    {
+        $product = DB::table('products')
+            ->join('users', 'users.id', 'products.user_id')
+            ->join('places', 'places.id', 'products.place_id')
+            ->join('images', 'products.id', 'images.product_id')
+            ->join('categories', 'categories.id', 'products.category_id')
+            ->where('categories.id', $categoryID)
+            ->select(
+                'products.id',
+                'users.id as user_id',
+                'products.created_at',
+                'places.name as place',
+                'images.image as product_image',
+                'product_desc',
+                'product_price',
+                'product_title',
+            )->orderBy('products.created_at', 'desc')->paginate(8);
+        return response()->json($product);
+    }
+
+    public function getProductByUser($userID)
+    {
+        $product = DB::table('products')
+            ->join('users', 'users.id', 'products.user_id')
+            ->join('places', 'places.id', 'products.place_id')
+            ->join('images', 'products.id', 'images.product_id')
+            ->join('categories', 'categories.id', 'products.category_id')
+            ->where('users.id', $userID)
+            ->select(
+                'products.id',
+                'users.id as user_id',
+                'products.created_at',
+                'places.name as place',
+                'images.image as product_image',
+                'product_desc',
+                'product_price',
+                'product_title',
+            )->orderBy('products.created_at', 'desc')->paginate(8);
+        return response()->json($product);
+    }
+
+    function search(Request $request){
+            $type=$request->type;
+            $brand=$request->brand;
+            $mileage=$request->mileage;
+            $filterAmoutInput=$request->filterPrice;
+            $filterAmount=json_decode($filterAmoutInput);
+            foreach($filterAmount as $key=>$i){
+            $filterAmount[$key]=(float)$i;
+            }
+
+            $resultsQuery=Product::where('price','>=',$filterAmount[0])->where('price','<=',$filterAmount[1]);
+            if($type!=''){
+                $resultsQuery=$resultsQuery->where('type','like',$type);
+            }
+            if($brand!=''){
+                $resultsQuery=$resultsQuery->where('brand','like',$brand);
+            }
+            if($mileage!=''){
+                $resultsQuery=$resultsQuery->where('mileage','like',$mileage);
+            }
+            $results=$resultsQuery->paginate(9);
+
+            return response()->json(
+            [
+                'products'=>$results,
+                'brands'=>Product::select('brand')->orderBy('brand')->distinct()->get(),
+                'mileages'=>Product::select('mileage')->orderBy('mileage')->distinct()->get(),
+                'typeSearch'=>$type,
+                'brandSearch'=>$brand,
+                'mileageSearch'=>$mileage,
+                'yearSearch'=>$year,
+                'fillterAmoutSearch'=>$filterAmoutInput
+            ]);
+
+     }
+    function searchText(Request $req){
+        $text=$req->input('textSearch');
+         $query=Product::
+         where('name','like','%'.$text.'%')
+         ->orWhere('price','=',(float)$text)
+         ->orWhere('brand','like','%'.$text.'%')->get();
+         return view('product.productList',
+         [
+             'products'=>$query,
+             'brands'=>DB::table('products')->select('brand')->orderBy('brand')->distinct()->get(),
+              'mileages'=>DB::table('products')->select('mileage')->orderBy('mileage')->distinct()->get(),
+             'years'=>DB::table('products')->select('year')->orderBy('year')->distinct()->get(),
+             'textSearch'=>$text
+        ]);
+    }
+    function rate(Request $req){
+        echo $req->productId;
+        $productRate=ProductRate::where('user_id',Auth::user()->id)->where('product_id',$req->productId)->get();
+        if(count($productRate)){
+        $productRate[0]->rate=$req->rate;
+        $productRate[0]->save();
+        $this->updateRateScore($req->productId);
+        }else{
+            $Rate= new ProductRate();
+            $Rate->user_id=Auth::user()->id;
+            $Rate->product_id=$req->productId;
+            $Rate->rate=$req->rate;
+            $Rate->save();
+            $this->updateRateScore($req->productId);
+        }
+        return redirect()->back();
+    }
+    function updateRateScore($productId){
+           $product=Product::find($productId);
+           $listRate=ProductRate::where('product_id',$product->id)->get();
+           $avg=0;
+           foreach($listRate as $r){
+              $avg+=$r->rate;
+           }
+           $avg=(float)$avg/count($listRate);
+           $product->rate=$avg;
+           $product->save();
+    }
 }
+

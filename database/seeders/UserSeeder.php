@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
     {
         $id_roles = DB::table('roles')->pluck('id');
         $id_statuses = DB::table('statuses')->pluck('id');
-        for ($i = 0; $i < 100; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             DB::table('users')->insert([
                 'full_name' => $faker->name,
                 'avatar' => $faker->imageUrl(),
@@ -26,7 +26,7 @@ class UserSeeder extends Seeder
                 'phone' => $faker->randomNumber($nbDigits = 9, $strict = false),
                 'email' => $faker->unique()->email,
                 'password' => Hash::make("password"),
-                'number_of_device' => $faker->numberBetween(1, 3),
+                'device_key'=>"device_key",
                 'role_id' => $faker->randomElement($id_roles),
                 'status_id' => $faker->randomElement($id_statuses),
                 'created_at' => $faker->dateTime($max = 'now'),
