@@ -17,11 +17,11 @@ class ShippingSeeder extends Seeder
     public function run(Faker $faker)
     {
         DB::table('shipping')->insert([
-            'shipping_name' => $faker->name,
-            'shipping_address' => $faker->address,
-            'shipping_phone' => $faker->randomNumber($nbDigits = 9, $strict = false),
-            'shipping_email' => $faker->unique()->email,
-            'created_at' => $faker->dateTime($max = 'now'),
+            'shipping_name' => 'shoses',
+            'shipping_address' => 'sơn trà, Đà Nẵng',
+            'shipping_phone' =>'0374551927',
+            'shipping_email' => 'nguyenthaihoang429424@gmail.com',
+            'created_at' => '2021-07-30 10:05:04',
             'updated_at' => date("Y-m-d H:i:s"),
         ]);
     }

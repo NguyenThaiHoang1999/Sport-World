@@ -35,6 +35,15 @@ class ProductController extends Controller
         return response()->json($products);
     }
 
+    public function getCategories()
+    {
+        $categories = DB::table('categories')->select(
+                'categories.id',
+                'categories.category_name',
+            )->first();
+        return response()->json($products);
+    }
+
     public function createProduct(Request $request)
     {
         $now = date("Y-m-d H:i:s");

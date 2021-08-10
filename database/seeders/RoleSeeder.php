@@ -14,19 +14,19 @@ class RoleSeeder extends Seeder
      * @return void
      */
 
-    public function run(Faker $faker)
+    public function run()
     {
             DB::table('roles')->insert(
                 [
-                    'name'=>'admin',
-                    'created_at' => $faker->dateTime($max = 'now'),
+                    'name'=>'private enterprise',
+                    'created_at' => date("Y-m-d H:i:s"),
                     'updated_at' => date("Y-m-d H:i:s"),
                 ]
             );
             DB::table('roles')->insert(
                 [
-                    'name'=>'user',
-                    'created_at' => $faker->dateTime($max = 'now'),
+                    'name'=>'individual',
+                    'created_at' => date("Y-m-d H:i:s"),
                     'updated_at' => date("Y-m-d H:i:s"),
                 ]
             );

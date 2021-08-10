@@ -15,8 +15,9 @@ class CreateBrandsTable extends Migration
     {
         Schema::create('brands', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
             $table->string('brand_name');
-            $table->text('brand_desc');
+            $table->text('brand_image');
             $table->timestamps();
         });
     }

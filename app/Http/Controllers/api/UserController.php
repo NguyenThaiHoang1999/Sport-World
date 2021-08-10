@@ -98,9 +98,6 @@ class UserController extends Controller
             if ($request->avatar != null) {
                 $fieldsToUpdate["avatar"] = $request->avatar;
             }
-            if ($request->gender != null) {
-                $fieldsToUpdate["gender"] = $request->gender;
-            }
             if ($request->address != null) {
                 $fieldsToUpdate["address"] = $request->address;
             }
