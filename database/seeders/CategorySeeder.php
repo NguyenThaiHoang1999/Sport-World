@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Faker\Generator as Faker;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
 

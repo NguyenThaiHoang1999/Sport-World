@@ -45,7 +45,9 @@ Route::get('/products', [ProductController::class, 'getProducts']);
 Route::post('/products', [ProductController::class, 'createProduct']);
 Route::get('/products/{id}', [ProductController::class, 'getProduct']);
 Route::get('/products/category/{id}', [ProductController::class, 'getProductByCategory']);
+Route::get('/products/user/{id}', [ProductController::class, 'getProductByUser']);
 Route::delete('/products/{id}', [ProductController::class, 'deleteProduct']);
+Route::post('/products/search', [ProductController::class, 'searchText']);
 
 /*===============================Notification==============================*/
 Route::get('/push-notificaiton', [WebNotificationController::class, 'index'])->name('push-notificaiton');

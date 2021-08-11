@@ -29,6 +29,7 @@ class ProductController extends Controller
                 'product_price',
                 'product_title',
             );
+
         $products = $products
             ->orderBy('products.created_at', 'desc')
             ->paginate(8);
@@ -46,15 +47,23 @@ class ProductController extends Controller
 
     public function createProduct(Request $request)
     {
+        $images=array($request->image);
         $now = date("Y-m-d H:i:s");
-        if (auth()->user() == null) {
-            return response()->json(["error" => "Your session has expired. Please sign in again."]);
-        }
-        $user_id = auth()->user()->id;
+        // if (auth()->user() == null) {
+        //     return response()->json(["error" => "Your session has expired. Please sign in again."]);
+        // }
+        // $user_id = auth()->user()->id;
         $last_id = DB::table('products')->selectRaw("MAX(id) as last_id")->first()->last_id + 1;
+        $last_place_id = DB::table('places')->selectRaw("MAX(id) as last_place_id")->first()->last_place_id + 1;
+        DB::table('places')->insert([
+            'id' => $last_place_id,
+            'name' => $request->place_name,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
         DB::table('products')->insert([
             'id' => $last_id,
-            'place_id' => $request->place_id,
+            'place_id' => $last_place_id,
             'product_desc' => $request->description,
             'product_name'  => $request->name,
             'brand_id'      =>$request->brand_id,
@@ -68,11 +77,12 @@ class ProductController extends Controller
         ]);
         DB::table('images')->insert([
             'product_id' => $last_id,
-            'image' => $request->image,
+            'image' => json_encode($images),
             'created_at' => $now,
             'updated_at' => $now,
         ]);
-        return response()->json(["message" => "Create new eating group successfully"]);
+
+        return response()->json(["message" => "Create new product successfully"]);
     }
     public function getProduct($id)
     {
@@ -80,6 +90,7 @@ class ProductController extends Controller
             ->join('users', 'users.id', 'products.user_id')
             ->join('places', 'places.id', 'products.place_id')
             ->join('images', 'products.id', 'images.product_id')
+            ->join('brands', 'brands.id', 'products.brand_id')
             ->join('categories', 'categories.id', 'products.category_id')
             ->where('products.id', $id)
             ->select(
@@ -87,6 +98,8 @@ class ProductController extends Controller
                 'users.id as user_id',
                 'users.avatar as user_avatar',
                 'full_name',
+                'categories.category_name',
+                'brands.brand_name',
                 'products.created_at',
                 'places.name as place',
                 'images.image as product_image',
@@ -125,9 +138,10 @@ class ProductController extends Controller
             ->join('places', 'places.id', 'products.place_id')
             ->join('images', 'products.id', 'images.product_id')
             ->join('categories', 'categories.id', 'products.category_id')
-            ->where('users.id', $userID)
+            ->where('products.user_id', $userID)
             ->select(
                 'products.id',
+                'products.product_name',
                 'users.id as user_id',
                 'products.created_at',
                 'places.name as place',
@@ -135,7 +149,7 @@ class ProductController extends Controller
                 'product_desc',
                 'product_price',
                 'product_title',
-            )->orderBy('products.created_at', 'desc')->paginate(8);
+            )->orderBy('products.created_at', 'desc')->get();
         return response()->json($product);
     }
 
@@ -175,19 +189,28 @@ class ProductController extends Controller
 
      }
     function searchText(Request $req){
-        $text=$req->input('textSearch');
-         $query=Product::
-         where('name','like','%'.$text.'%')
-         ->orWhere('price','=',(float)$text)
-         ->orWhere('brand','like','%'.$text.'%')->get();
-         return view('product.productList',
-         [
-             'products'=>$query,
-             'brands'=>DB::table('products')->select('brand')->orderBy('brand')->distinct()->get(),
-              'mileages'=>DB::table('products')->select('mileage')->orderBy('mileage')->distinct()->get(),
-             'years'=>DB::table('products')->select('year')->orderBy('year')->distinct()->get(),
-             'textSearch'=>$text
-        ]);
+        $text=$req->textSearch;
+        // $query=Product::where('product_name','LIKE',"%".$text."%")->get();
+        $query=DB::table('products')
+        ->join('users', 'users.id', 'products.user_id')
+        ->join('places', 'places.id', 'products.place_id')
+        ->join('images', 'products.id', 'images.product_id')
+        ->join('categories', 'categories.id', 'products.category_id')
+        ->where('products.product_name','LIKE','%'.$text.'%')
+        ->orWhere('products.product_price','=', $text)
+        ->select(
+        'products.id',
+        'products.product_name',
+        'users.id as user_id',
+        'products.created_at',
+        'places.name as place',
+        'images.image as product_image',
+        'products.product_desc',
+        'products.product_price',
+        'products.product_title',)
+        ->orderBy('products.id', 'desc')
+        ->get();
+         return response()->json(['products'=>$query]);
     }
     function rate(Request $req){
         echo $req->productId;

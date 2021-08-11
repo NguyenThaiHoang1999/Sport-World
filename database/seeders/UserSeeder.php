@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Faker\Generator as Faker;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -14,7 +13,7 @@ class UserSeeder extends Seeder
      *
      * @return void
      */
-    public function run(Faker $faker)
+    public function run()
     {
 
             DB::table('users')->insert([
